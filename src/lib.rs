@@ -49,10 +49,10 @@ use std::{
     time::Duration,
 };
 
-#[cfg(any(feature = "nd"))]
+#[cfg(feature = "nd")]
 use ndarray::{Array1, Array2};
 
-#[cfg(any(feature = "csv"))]
+#[cfg(feature = "csv")]
 use {
     polars::prelude::{DataFrame, Float32Type},
     utils::validate_and_read,
@@ -94,7 +94,7 @@ impl IntoSupervisedData for Dataset<f32, f32> {
     }
 }
 
-#[cfg(any(feature = "csv"))]
+#[cfg(feature = "csv")]
 impl IntoSupervisedData for (&str, usize) {
     fn to_supervised_data(self) -> (DenseMatrix<f32>, Vec<f32>) {
         let (filepath, target_index) = self;
@@ -116,7 +116,7 @@ impl IntoSupervisedData for (&str, usize) {
     }
 }
 
-#[cfg(any(feature = "csv"))]
+#[cfg(feature = "csv")]
 impl IntoFeatures for &str {
     fn to_dense_matrix(self) -> DenseMatrix<f32> {
         let df = validate_and_read(self);
@@ -150,14 +150,14 @@ impl IntoLabels for Vec<f32> {
     }
 }
 
-#[cfg(any(feature = "nd"))]
+#[cfg(feature = "nd")]
 impl IntoFeatures for Array2<f32> {
     fn to_dense_matrix(self) -> DenseMatrix<f32> {
         DenseMatrix::from_array(self.shape()[0], self.shape()[1], self.as_slice().unwrap())
     }
 }
 
-#[cfg(any(feature = "nd"))]
+#[cfg(feature = "nd")]
 impl IntoLabels for Array1<f32> {
     fn into_vec(self) -> Vec<f32> {
         self.to_vec()

@@ -97,10 +97,10 @@ pub fn elementwise_multiply(v1: &[f32], v2: &[f32]) -> Vec<f32> {
     v1.iter().zip(v2).map(|(&i1, &i2)| i1 * i2).collect()
 }
 
-#[cfg(any(feature = "csv"))]
+#[cfg(feature = "csv")]
 use polars::prelude::{CsvReader, DataFrame, PolarsError, SerReader};
 
-#[cfg(any(feature = "csv"))]
+#[cfg(feature = "csv")]
 /// Read and validate a csv file or URL into a polars `DataFrame`.
 pub fn validate_and_read<P>(file_path: P) -> DataFrame
 where
@@ -141,13 +141,13 @@ where
 }
 
 /// Trait to convert to a polars `DataFrame`.
-#[cfg(any(feature = "csv"))]
+#[cfg(feature = "csv")]
 trait Cleanup {
     /// Convert to a polars `DataFrame` with all columns of type float.
     fn convert_to_float(self) -> Result<DataFrame, PolarsError>;
 }
 
-#[cfg(any(feature = "csv"))]
+#[cfg(feature = "csv")]
 impl Cleanup for DataFrame {
     #[allow(unused_mut)]
     fn convert_to_float(mut self) -> Result<DataFrame, PolarsError> {
