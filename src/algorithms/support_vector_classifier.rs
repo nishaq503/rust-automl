@@ -24,16 +24,17 @@ impl super::ModelWrapper for SupportVectorClassifierWrapper {
         y: &Vec<f32>,
         settings: &Settings,
     ) -> (CrossValidationResult<f32>, Algorithm) {
+        let parameters = SmartcoreSVCParameters::default()
+            .with_tol(settings.svc_settings.as_ref().unwrap().tol)
+            .with_c(settings.svc_settings.as_ref().unwrap().c)
+            .with_epoch(settings.svc_settings.as_ref().unwrap().epoch);
+
         let cv = match settings.svc_settings.as_ref().unwrap().kernel {
             Kernel::Linear => cross_validate(
                 SVC::fit,
                 x,
                 y,
-                SmartcoreSVCParameters::default()
-                    .with_tol(settings.svc_settings.as_ref().unwrap().tol)
-                    .with_c(settings.svc_settings.as_ref().unwrap().c)
-                    .with_epoch(settings.svc_settings.as_ref().unwrap().epoch)
-                    .with_kernel(Kernels::linear()),
+                parameters.with_kernel(Kernels::linear()),
                 settings.get_kfolds(),
                 settings.get_metric(),
             )
@@ -42,11 +43,7 @@ impl super::ModelWrapper for SupportVectorClassifierWrapper {
                 SVC::fit,
                 x,
                 y,
-                SmartcoreSVCParameters::default()
-                    .with_tol(settings.svc_settings.as_ref().unwrap().tol)
-                    .with_c(settings.svc_settings.as_ref().unwrap().c)
-                    .with_epoch(settings.svc_settings.as_ref().unwrap().epoch)
-                    .with_kernel(Kernels::polynomial(degree, gamma, coef)),
+                parameters.with_kernel(Kernels::polynomial(degree, gamma, coef)),
                 settings.get_kfolds(),
                 settings.get_metric(),
             )
@@ -55,11 +52,7 @@ impl super::ModelWrapper for SupportVectorClassifierWrapper {
                 SVC::fit,
                 x,
                 y,
-                SmartcoreSVCParameters::default()
-                    .with_tol(settings.svc_settings.as_ref().unwrap().tol)
-                    .with_c(settings.svc_settings.as_ref().unwrap().c)
-                    .with_epoch(settings.svc_settings.as_ref().unwrap().epoch)
-                    .with_kernel(Kernels::rbf(gamma)),
+                parameters.with_kernel(Kernels::rbf(gamma)),
                 settings.get_kfolds(),
                 settings.get_metric(),
             )
@@ -68,11 +61,7 @@ impl super::ModelWrapper for SupportVectorClassifierWrapper {
                 SVC::fit,
                 x,
                 y,
-                SmartcoreSVCParameters::default()
-                    .with_tol(settings.svc_settings.as_ref().unwrap().tol)
-                    .with_c(settings.svc_settings.as_ref().unwrap().c)
-                    .with_epoch(settings.svc_settings.as_ref().unwrap().epoch)
-                    .with_kernel(Kernels::sigmoid(gamma, coef)),
+                parameters.with_kernel(Kernels::sigmoid(gamma, coef)),
                 settings.get_kfolds(),
                 settings.get_metric(),
             )
@@ -82,43 +71,32 @@ impl super::ModelWrapper for SupportVectorClassifierWrapper {
     }
 
     fn train(x: &DenseMatrix<f32>, y: &Vec<f32>, settings: &Settings) -> Vec<u8> {
+        let parameters = SmartcoreSVCParameters::default()
+            .with_tol(settings.svc_settings.as_ref().unwrap().tol)
+            .with_c(settings.svc_settings.as_ref().unwrap().c)
+            .with_epoch(settings.svc_settings.as_ref().unwrap().epoch);
         match settings.svc_settings.as_ref().unwrap().kernel {
-            Kernel::Linear => {
-                let params = SmartcoreSVCParameters::default()
-                    .with_tol(settings.svc_settings.as_ref().unwrap().tol)
-                    .with_c(settings.svc_settings.as_ref().unwrap().c)
-                    .with_epoch(settings.svc_settings.as_ref().unwrap().epoch)
-                    .with_kernel(Kernels::linear());
-
-                bincode::serialize(&SVC::fit(x, y, params).unwrap()).unwrap()
-            }
-            Kernel::Polynomial(degree, gamma, coef) => {
-                let params = SmartcoreSVCParameters::default()
-                    .with_tol(settings.svc_settings.as_ref().unwrap().tol)
-                    .with_c(settings.svc_settings.as_ref().unwrap().c)
-                    .with_epoch(settings.svc_settings.as_ref().unwrap().epoch)
-                    .with_kernel(Kernels::polynomial(degree, gamma, coef));
-
-                bincode::serialize(&SVC::fit(x, y, params).unwrap()).unwrap()
-            }
-            Kernel::RBF(gamma) => {
-                let params = SmartcoreSVCParameters::default()
-                    .with_tol(settings.svc_settings.as_ref().unwrap().tol)
-                    .with_c(settings.svc_settings.as_ref().unwrap().c)
-                    .with_epoch(settings.svc_settings.as_ref().unwrap().epoch)
-                    .with_kernel(Kernels::rbf(gamma));
-
-                bincode::serialize(&SVC::fit(x, y, params).unwrap()).unwrap()
-            }
-            Kernel::Sigmoid(gamma, coef) => {
-                let params = SmartcoreSVCParameters::default()
-                    .with_tol(settings.svc_settings.as_ref().unwrap().tol)
-                    .with_c(settings.svc_settings.as_ref().unwrap().c)
-                    .with_epoch(settings.svc_settings.as_ref().unwrap().epoch)
-                    .with_kernel(Kernels::sigmoid(gamma, coef));
-
-                bincode::serialize(&SVC::fit(x, y, params).unwrap()).unwrap()
-            }
+            Kernel::Linear => bincode::serialize(
+                &SVC::fit(x, y, parameters.with_kernel(Kernels::linear())).unwrap(),
+            )
+            .unwrap(),
+            Kernel::Polynomial(degree, gamma, coef) => bincode::serialize(
+                &SVC::fit(
+                    x,
+                    y,
+                    parameters.with_kernel(Kernels::polynomial(degree, gamma, coef)),
+                )
+                .unwrap(),
+            )
+            .unwrap(),
+            Kernel::RBF(gamma) => bincode::serialize(
+                &SVC::fit(x, y, parameters.with_kernel(Kernels::rbf(gamma))).unwrap(),
+            )
+            .unwrap(),
+            Kernel::Sigmoid(gamma, coef) => bincode::serialize(
+                &SVC::fit(x, y, parameters.with_kernel(Kernels::sigmoid(gamma, coef))).unwrap(),
+            )
+            .unwrap(),
         }
     }
 

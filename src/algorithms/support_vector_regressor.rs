@@ -24,16 +24,16 @@ impl super::ModelWrapper for SupportVectorRegressorWrapper {
         y: &Vec<f32>,
         settings: &Settings,
     ) -> (CrossValidationResult<f32>, Algorithm) {
+        let parameters = SmartcoreSVRParameters::default()
+            .with_tol(settings.svr_settings.as_ref().unwrap().tol)
+            .with_c(settings.svr_settings.as_ref().unwrap().c)
+            .with_eps(settings.svr_settings.as_ref().unwrap().c);
         let cv = match settings.svr_settings.as_ref().unwrap().kernel {
             Kernel::Linear => cross_validate(
                 SVR::fit,
                 x,
                 y,
-                SmartcoreSVRParameters::default()
-                    .with_tol(settings.svr_settings.as_ref().unwrap().tol)
-                    .with_c(settings.svr_settings.as_ref().unwrap().c)
-                    .with_eps(settings.svr_settings.as_ref().unwrap().c)
-                    .with_kernel(Kernels::linear()),
+                parameters.with_kernel(Kernels::linear()),
                 settings.get_kfolds(),
                 settings.get_metric(),
             )
@@ -42,11 +42,7 @@ impl super::ModelWrapper for SupportVectorRegressorWrapper {
                 SVR::fit,
                 x,
                 y,
-                SmartcoreSVRParameters::default()
-                    .with_tol(settings.svr_settings.as_ref().unwrap().tol)
-                    .with_c(settings.svr_settings.as_ref().unwrap().c)
-                    .with_eps(settings.svr_settings.as_ref().unwrap().c)
-                    .with_kernel(Kernels::polynomial(degree, gamma, coef)),
+                parameters.with_kernel(Kernels::polynomial(degree, gamma, coef)),
                 settings.get_kfolds(),
                 settings.get_metric(),
             )
@@ -55,11 +51,7 @@ impl super::ModelWrapper for SupportVectorRegressorWrapper {
                 SVR::fit,
                 x,
                 y,
-                SmartcoreSVRParameters::default()
-                    .with_tol(settings.svr_settings.as_ref().unwrap().tol)
-                    .with_c(settings.svr_settings.as_ref().unwrap().c)
-                    .with_eps(settings.svr_settings.as_ref().unwrap().c)
-                    .with_kernel(Kernels::rbf(gamma)),
+                parameters.with_kernel(Kernels::rbf(gamma)),
                 settings.get_kfolds(),
                 settings.get_metric(),
             )
@@ -68,11 +60,7 @@ impl super::ModelWrapper for SupportVectorRegressorWrapper {
                 SVR::fit,
                 x,
                 y,
-                SmartcoreSVRParameters::default()
-                    .with_tol(settings.svr_settings.as_ref().unwrap().tol)
-                    .with_c(settings.svr_settings.as_ref().unwrap().c)
-                    .with_eps(settings.svr_settings.as_ref().unwrap().c)
-                    .with_kernel(Kernels::sigmoid(gamma, coef)),
+                parameters.with_kernel(Kernels::sigmoid(gamma, coef)),
                 settings.get_kfolds(),
                 settings.get_metric(),
             )
@@ -82,43 +70,32 @@ impl super::ModelWrapper for SupportVectorRegressorWrapper {
     }
 
     fn train(x: &DenseMatrix<f32>, y: &Vec<f32>, settings: &Settings) -> Vec<u8> {
+        let parameters = SmartcoreSVRParameters::default()
+            .with_tol(settings.svr_settings.as_ref().unwrap().tol)
+            .with_c(settings.svr_settings.as_ref().unwrap().c)
+            .with_eps(settings.svr_settings.as_ref().unwrap().c);
         match settings.svr_settings.as_ref().unwrap().kernel {
-            Kernel::Linear => {
-                let params = SmartcoreSVRParameters::default()
-                    .with_tol(settings.svr_settings.as_ref().unwrap().tol)
-                    .with_c(settings.svr_settings.as_ref().unwrap().c)
-                    .with_eps(settings.svr_settings.as_ref().unwrap().c)
-                    .with_kernel(Kernels::linear());
-
-                bincode::serialize(&SVR::fit(x, y, params).unwrap()).unwrap()
-            }
-            Kernel::Polynomial(degree, gamma, coef) => {
-                let params = SmartcoreSVRParameters::default()
-                    .with_tol(settings.svr_settings.as_ref().unwrap().tol)
-                    .with_c(settings.svr_settings.as_ref().unwrap().c)
-                    .with_eps(settings.svr_settings.as_ref().unwrap().c)
-                    .with_kernel(Kernels::polynomial(degree, gamma, coef));
-
-                bincode::serialize(&SVR::fit(x, y, params).unwrap()).unwrap()
-            }
-            Kernel::RBF(gamma) => {
-                let params = SmartcoreSVRParameters::default()
-                    .with_tol(settings.svr_settings.as_ref().unwrap().tol)
-                    .with_c(settings.svr_settings.as_ref().unwrap().c)
-                    .with_eps(settings.svr_settings.as_ref().unwrap().c)
-                    .with_kernel(Kernels::rbf(gamma));
-
-                bincode::serialize(&SVR::fit(x, y, params).unwrap()).unwrap()
-            }
-            Kernel::Sigmoid(gamma, coef) => {
-                let params = SmartcoreSVRParameters::default()
-                    .with_tol(settings.svr_settings.as_ref().unwrap().tol)
-                    .with_c(settings.svr_settings.as_ref().unwrap().c)
-                    .with_eps(settings.svr_settings.as_ref().unwrap().c)
-                    .with_kernel(Kernels::sigmoid(gamma, coef));
-
-                bincode::serialize(&SVR::fit(x, y, params).unwrap()).unwrap()
-            }
+            Kernel::Linear => bincode::serialize(
+                &SVR::fit(x, y, parameters.with_kernel(Kernels::linear())).unwrap(),
+            )
+            .unwrap(),
+            Kernel::Polynomial(degree, gamma, coef) => bincode::serialize(
+                &SVR::fit(
+                    x,
+                    y,
+                    parameters.with_kernel(Kernels::polynomial(degree, gamma, coef)),
+                )
+                .unwrap(),
+            )
+            .unwrap(),
+            Kernel::RBF(gamma) => bincode::serialize(
+                &SVR::fit(x, y, parameters.with_kernel(Kernels::rbf(gamma))).unwrap(),
+            )
+            .unwrap(),
+            Kernel::Sigmoid(gamma, coef) => bincode::serialize(
+                &SVR::fit(x, y, parameters.with_kernel(Kernels::sigmoid(gamma, coef))).unwrap(),
+            )
+            .unwrap(),
         }
     }
 

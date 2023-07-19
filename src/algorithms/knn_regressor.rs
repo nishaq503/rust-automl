@@ -27,30 +27,31 @@ impl super::ModelWrapper for KNNRegressorWrapper {
         y: &Vec<f32>,
         settings: &Settings,
     ) -> (CrossValidationResult<f32>, Algorithm) {
+        let parameters = SmartcoreKNNRegressorParameters::default()
+            .with_k(settings.knn_regressor_settings.as_ref().unwrap().k)
+            .with_algorithm(
+                settings
+                    .knn_regressor_settings
+                    .as_ref()
+                    .unwrap()
+                    .algorithm
+                    .clone(),
+            )
+            .with_weight(
+                settings
+                    .knn_regressor_settings
+                    .as_ref()
+                    .unwrap()
+                    .weight
+                    .clone(),
+            );
+
         let cv = match settings.knn_regressor_settings.as_ref().unwrap().distance {
             Distance::Euclidean => cross_validate(
                 KNNRegressor::fit,
                 x,
                 y,
-                SmartcoreKNNRegressorParameters::default()
-                    .with_k(settings.knn_regressor_settings.as_ref().unwrap().k)
-                    .with_algorithm(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .unwrap()
-                            .algorithm
-                            .clone(),
-                    )
-                    .with_weight(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .unwrap()
-                            .weight
-                            .clone(),
-                    )
-                    .with_distance(Distances::euclidian()),
+                parameters.with_distance(Distances::euclidian()),
                 settings.get_kfolds(),
                 settings.get_metric(),
             )
@@ -59,25 +60,7 @@ impl super::ModelWrapper for KNNRegressorWrapper {
                 KNNRegressor::fit,
                 x,
                 y,
-                SmartcoreKNNRegressorParameters::default()
-                    .with_k(settings.knn_regressor_settings.as_ref().unwrap().k)
-                    .with_algorithm(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .unwrap()
-                            .algorithm
-                            .clone(),
-                    )
-                    .with_weight(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .unwrap()
-                            .weight
-                            .clone(),
-                    )
-                    .with_distance(Distances::manhattan()),
+                parameters.with_distance(Distances::manhattan()),
                 settings.get_kfolds(),
                 settings.get_metric(),
             )
@@ -86,25 +69,7 @@ impl super::ModelWrapper for KNNRegressorWrapper {
                 KNNRegressor::fit,
                 x,
                 y,
-                SmartcoreKNNRegressorParameters::default()
-                    .with_k(settings.knn_regressor_settings.as_ref().unwrap().k)
-                    .with_algorithm(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .unwrap()
-                            .algorithm
-                            .clone(),
-                    )
-                    .with_weight(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .unwrap()
-                            .weight
-                            .clone(),
-                    )
-                    .with_distance(Distances::minkowski(p)),
+                parameters.with_distance(Distances::minkowski(p)),
                 settings.get_kfolds(),
                 settings.get_metric(),
             )
@@ -113,25 +78,7 @@ impl super::ModelWrapper for KNNRegressorWrapper {
                 KNNRegressor::fit,
                 x,
                 y,
-                SmartcoreKNNRegressorParameters::default()
-                    .with_k(settings.knn_regressor_settings.as_ref().unwrap().k)
-                    .with_algorithm(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .unwrap()
-                            .algorithm
-                            .clone(),
-                    )
-                    .with_weight(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .unwrap()
-                            .weight
-                            .clone(),
-                    )
-                    .with_distance(Distances::mahalanobis(x)),
+                parameters.with_distance(Distances::mahalanobis(x)),
                 settings.get_kfolds(),
                 settings.get_metric(),
             )
@@ -140,25 +87,7 @@ impl super::ModelWrapper for KNNRegressorWrapper {
                 KNNRegressor::fit,
                 x,
                 y,
-                SmartcoreKNNRegressorParameters::default()
-                    .with_k(settings.knn_regressor_settings.as_ref().unwrap().k)
-                    .with_algorithm(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .unwrap()
-                            .algorithm
-                            .clone(),
-                    )
-                    .with_weight(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .unwrap()
-                            .weight
-                            .clone(),
-                    )
-                    .with_distance(Distances::hamming()),
+                parameters.with_distance(Distances::hamming()),
                 settings.get_kfolds(),
                 settings.get_metric(),
             )
@@ -169,124 +98,47 @@ impl super::ModelWrapper for KNNRegressorWrapper {
     }
 
     fn train(x: &DenseMatrix<f32>, y: &Vec<f32>, settings: &Settings) -> Vec<u8> {
+        let parameters = SmartcoreKNNRegressorParameters::default()
+            .with_k(settings.knn_regressor_settings.as_ref().unwrap().k)
+            .with_algorithm(
+                settings
+                    .knn_regressor_settings
+                    .as_ref()
+                    .unwrap()
+                    .algorithm
+                    .clone(),
+            )
+            .with_weight(
+                settings
+                    .knn_regressor_settings
+                    .as_ref()
+                    .unwrap()
+                    .weight
+                    .clone(),
+            );
         match settings.knn_regressor_settings.as_ref().unwrap().distance {
-            Distance::Euclidean => {
-                let params = SmartcoreKNNRegressorParameters::default()
-                    .with_k(settings.knn_regressor_settings.as_ref().unwrap().k)
-                    .with_algorithm(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .unwrap()
-                            .algorithm
-                            .clone(),
-                    )
-                    .with_weight(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .unwrap()
-                            .weight
-                            .clone(),
-                    )
-                    .with_distance(Distances::euclidian());
-
-                bincode::serialize(&KNNRegressor::fit(x, y, params).unwrap()).unwrap()
-            }
-            Distance::Manhattan => {
-                let params = SmartcoreKNNRegressorParameters::default()
-                    .with_k(settings.knn_regressor_settings.as_ref().unwrap().k)
-                    .with_algorithm(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .unwrap()
-                            .algorithm
-                            .clone(),
-                    )
-                    .with_weight(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .unwrap()
-                            .weight
-                            .clone(),
-                    )
-                    .with_distance(Distances::manhattan());
-
-                bincode::serialize(&KNNRegressor::fit(x, y, params).unwrap()).unwrap()
-            }
-            Distance::Minkowski(p) => {
-                let params = SmartcoreKNNRegressorParameters::default()
-                    .with_k(settings.knn_regressor_settings.as_ref().unwrap().k)
-                    .with_algorithm(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .unwrap()
-                            .algorithm
-                            .clone(),
-                    )
-                    .with_weight(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .as_ref()
-                            .unwrap()
-                            .weight
-                            .clone(),
-                    )
-                    .with_distance(Distances::minkowski(p));
-
-                bincode::serialize(&KNNRegressor::fit(x, y, params).unwrap()).unwrap()
-            }
-            Distance::Mahalanobis => {
-                let params = SmartcoreKNNRegressorParameters::default()
-                    .with_k(settings.knn_regressor_settings.as_ref().unwrap().k)
-                    .with_algorithm(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .unwrap()
-                            .algorithm
-                            .clone(),
-                    )
-                    .with_weight(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .as_ref()
-                            .unwrap()
-                            .weight
-                            .clone(),
-                    )
-                    .with_distance(Distances::mahalanobis(x));
-                bincode::serialize(&KNNRegressor::fit(x, y, params).unwrap()).unwrap()
-            }
-            Distance::Hamming => {
-                let params = SmartcoreKNNRegressorParameters::default()
-                    .with_k(settings.knn_regressor_settings.as_ref().unwrap().k)
-                    .with_algorithm(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .unwrap()
-                            .algorithm
-                            .clone(),
-                    )
-                    .with_weight(
-                        settings
-                            .knn_regressor_settings
-                            .as_ref()
-                            .as_ref()
-                            .unwrap()
-                            .weight
-                            .clone(),
-                    )
-                    .with_distance(Distances::hamming());
-
-                bincode::serialize(&KNNRegressor::fit(x, y, params).unwrap()).unwrap()
-            }
+            Distance::Euclidean => bincode::serialize(
+                &KNNRegressor::fit(x, y, parameters.with_distance(Distances::euclidian())).unwrap(),
+            )
+            .unwrap(),
+            Distance::Manhattan => bincode::serialize(
+                &KNNRegressor::fit(x, y, parameters.with_distance(Distances::manhattan())).unwrap(),
+            )
+            .unwrap(),
+            Distance::Minkowski(p) => bincode::serialize(
+                &KNNRegressor::fit(x, y, parameters.with_distance(Distances::minkowski(p)))
+                    .unwrap(),
+            )
+            .unwrap(),
+            Distance::Mahalanobis => bincode::serialize(
+                &KNNRegressor::fit(x, y, parameters.with_distance(Distances::mahalanobis(x)))
+                    .unwrap(),
+            )
+            .unwrap(),
+            Distance::Hamming => bincode::serialize(
+                &KNNRegressor::fit(x, y, parameters.with_distance(Distances::hamming())).unwrap(),
+            )
+            .unwrap(),
         }
     }
 
