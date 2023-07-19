@@ -1,5 +1,6 @@
 #![deny(clippy::correctness)]
 #![warn(
+    missing_docs,
     clippy::all,
     clippy::suspicious,
     clippy::complexity,
@@ -8,9 +9,9 @@
     clippy::pedantic,
     clippy::nursery,
     clippy::missing_docs_in_private_items
+    // rustdoc::missing_doc_code_examples  // This is a nightly only feature.
 )]
 #![allow(clippy::module_name_repetitions, clippy::too_many_lines)]
-#![warn(missing_docs, rustdoc::missing_doc_code_examples)]
 #![doc = include_str!("../README.md")]
 
 pub mod settings;
