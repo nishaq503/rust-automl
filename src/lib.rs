@@ -197,7 +197,7 @@ impl SupervisedModel {
     ///     (vec![vec![1.0; 5]; 5],
     ///     vec![1.0; 5]),
     ///     automl::Settings::default_regression(),
-    /// );    
+    /// );
     /// ```
     /// It also works for some ndarray datatypes:
     /// ```

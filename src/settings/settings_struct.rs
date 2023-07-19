@@ -396,7 +396,7 @@ impl Settings {
     /// ```
     /// # use automl::Settings;
     /// use automl::settings::{SVCParameters, Kernel};
-    /// let settings = Settings::default()    
+    /// let settings = Settings::default()
     ///     .with_svc_settings(SVCParameters::default()
     ///         .with_epoch(10)
     ///         .with_tol(1e-10)
@@ -543,7 +543,7 @@ impl Settings {
     ///         .with_normalize(true)
     ///         .with_alpha(1.0)
     ///         .with_max_iter(10_000)
-    ///         .with_l1_ratio(0.5)    
+    ///         .with_l1_ratio(0.5)
     ///     );
     /// ```
     #[must_use]
@@ -575,7 +575,7 @@ impl Settings {
     /// ```
     /// # use automl::Settings;
     /// use automl::settings::{SVRParameters, Kernel};
-    /// let settings = Settings::default()    
+    /// let settings = Settings::default()
     ///     .with_svr_settings(SVRParameters::default()
     ///         .with_eps(1e-10)
     ///         .with_tol(1e-10)
