@@ -11,7 +11,10 @@
     clippy::missing_docs_in_private_items
     // rustdoc::missing_doc_code_examples  // This is a nightly only feature.
 )]
-#![allow(clippy::module_name_repetitions, clippy::too_many_lines)]
+#![allow(
+    clippy::module_name_repetitions,  // This would take a major refactoring and API change
+    clippy::too_many_lines,  // The last couple of lints for this are probably better done using traits.
+)]
 #![doc = include_str!("../README.md")]
 
 pub mod settings;
