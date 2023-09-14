@@ -252,6 +252,13 @@ impl SupervisedModel {
     }
 
     /// Load the supervised model from a file saved previously
+    ///
+    /// # Panics
+    ///
+    /// Panics if the file cannot be read or deserialized.
+    ///
+    /// # Example
+    ///
     /// ```
     /// # use automl::{SupervisedModel, Settings};
     /// # let mut model = SupervisedModel::new(
@@ -545,6 +552,13 @@ impl SupervisedModel {
     }
 
     /// Save the supervised model to a file for later use
+    ///
+    /// # Panics
+    ///
+    /// Panics if the file cannot be written to or serialized.
+    ///
+    /// # Example
+    ///
     /// ```
     /// # use automl::{SupervisedModel, Settings};
     /// let mut model = SupervisedModel::new(
@@ -562,6 +576,13 @@ impl SupervisedModel {
     }
 
     /// Save the best model for later use as a smartcore native object.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the file cannot be written to or serialized.
+    ///
+    /// # Example
+    ///
     /// ```
     /// # use automl::{SupervisedModel, Settings, settings::Algorithm};
     /// use std::io::Read;

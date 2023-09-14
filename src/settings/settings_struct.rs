@@ -230,6 +230,13 @@ impl Settings {
     }
 
     /// Load settings from a settings file
+    ///
+    /// # Panics
+    ///
+    /// Panics if the file cannot be read or deserialized.
+    ///
+    /// # Example
+    ///
     /// ```
     /// # use automl::Settings;
     /// # let settings = Settings::default();
@@ -247,6 +254,13 @@ impl Settings {
     }
 
     /// Save the current settings to a file for later use
+    ///
+    /// # Panics
+    ///
+    /// Panics if the file cannot be written or serialized.
+    ///
+    /// # Example
+    ///
     /// ```
     /// # use automl::Settings;
     /// let settings = Settings::default_regression();
